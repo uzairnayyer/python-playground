@@ -4,7 +4,6 @@ import customtkinter as ctk
 import random
 import time
 
-# Initialize CustomTkinter
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
 
@@ -19,11 +18,9 @@ class GameApp:
         self.main_menu = ctk.CTkFrame(self.root)
         self.main_menu.pack(pady=20, padx=20, fill="both", expand=True)
         
-        # Title Label
         self.title_label = ctk.CTkLabel(self.main_menu, text="Python Playgroundd", font=("Arial", 24))
         self.title_label.pack(pady=10)
 
-        # Title Label
         self.title_label = ctk.CTkLabel(self.main_menu, text="Select a game to play", font=("Arial", 16))
         self.title_label.pack(pady=10)
 
@@ -67,7 +64,7 @@ class GameApp:
         self.clear_frame()
         WordScramble(self.root, self)
 
-# Guess the Word Class
+# Guess the Word Game Class
 class GuessTheWord:
     def __init__(self, root, app):
         self.root = root
@@ -135,7 +132,6 @@ class GuessTheWord:
         self.frame.destroy()
         self.app.__init__(self.root)
 
-# Placeholder for other classes (QuizGame, RockPaperScissors, etc.)
 class QuizGame:
     def __init__(self, root, app):
         self.root = root
@@ -403,3 +399,4 @@ if __name__ == "__main__":
     root = ctk.CTk()
     app = GameApp(root)
     root.mainloop()
+
