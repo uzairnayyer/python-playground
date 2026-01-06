@@ -40,6 +40,9 @@ class GameApp:
         self.btn_word_scramble = ctk.CTkButton(self.main_menu, text="Word Scramble", command=self.start_word_scramble)
         self.btn_word_scramble.pack(pady=5)
 
+        self.btn_number_guess = ctk.CTkButton(self.main_menu, text="Number Guessing Game", command=self.start_number_guess)
+        self.btn_number_guess.pack(pady=5)
+
     def clear_frame(self):
         for widget in self.root.winfo_children():
             widget.destroy()
@@ -63,6 +66,10 @@ class GameApp:
     def start_word_scramble(self):
         self.clear_frame()
         WordScramble(self.root, self)
+
+    def start_number_guess(self):
+        self.clear_frame()
+        NumberGuessingGame(self.root, self)
 
 # Guess the Word Game Class
 class GuessTheWord:
@@ -395,8 +402,111 @@ class WordScramble:
         self.frame.destroy()
         self.app.__init__(self.root)
 
+class NumberGuessingGame:
+    def __init__(self, root, app):
+        self.root = root
+        self.app = app
+
+        self.min_number = 1
+        self.max_number = 100
+        self.max_attempts = 7
+
+        self.secret_number = None
+        self.attempts_left = self.max_attempts
+        self.score = 0
+
+        self.frame = ctk.CTkFrame(self.root)
+        self.frame.pack(pady=20, padx=20, fill="both", expand=True)
+
+        self.title_label = ctk.CTkLabel(self.frame, text="Number Guessing Game", font=("Arial", 18))
+        self.title_label.pack(pady=10)
+
+        self.instruction_label = ctk.CTkLabel(
+            self.frame,
+            text=f"Guess a number between {self.min_number} and {self.max_number}.",
+            font=("Arial", 14),
+            wraplength=500
+        )
+        self.instruction_label.pack(pady=10)
+
+        self.entry = ctk.CTkEntry(self.frame, placeholder_text="Enter your guess")
+        self.entry.pack(pady=5)
+
+        self.submit_button = ctk.CTkButton(self.frame, text="Submit", command=self.check_guess)
+        self.submit_button.pack(pady=10)
+
+        self.status_label = ctk.CTkLabel(self.frame, text="", font=("Arial", 14))
+        self.status_label.pack(pady=10)
+
+        self.score_label = ctk.CTkLabel(self.frame, text=f"Score: {self.score}", font=("Arial", 14))
+        self.score_label.pack(pady=10)
+
+        self.back_button = ctk.CTkButton(self.frame, text="Back to Menu", command=self.go_back)
+        self.back_button.pack(pady=10)
+
+        self.new_round()
+
+    def new_round(self):
+        self.secret_number = random.randint(self.min_number, self.max_number)
+        self.attempts_left = self.max_attempts
+        self.status_label.configure(
+            text=f"New round started! Attempts left: {self.attempts_left}",
+            fg_color=None
+        )
+        self.entry.delete(0, tk.END)
+
+    def check_guess(self):
+        guess_text = self.entry.get().strip()
+
+        if not guess_text.isdigit():
+            self.status_label.configure(text="Please enter a valid number.", fg_color="red")
+            return
+
+        guess = int(guess_text)
+
+        if guess < self.min_number or guess > self.max_number:
+            self.status_label.configure(
+                text=f"Number must be between {self.min_number} and {self.max_number}.",
+                fg_color="red"
+            )
+            return
+
+        self.attempts_left -= 1
+
+        if guess == self.secret_number:
+            self.score += 1
+            self.score_label.configure(text=f"Score: {self.score}")
+            self.status_label.configure(
+                text=f"Correct! The number was {self.secret_number}. Starting a new round...",
+                fg_color="green"
+            )
+            self.new_round()
+        else:
+            if guess < self.secret_number:
+                hint = "Too low!"
+            else:
+                hint = "Too high!"
+
+            if self.attempts_left > 0:
+                self.status_label.configure(
+                    text=f"{hint} Attempts left: {self.attempts_left}",
+                    fg_color="red"
+                )
+            else:
+                self.status_label.configure(
+                    text=f"Out of attempts! The number was {self.secret_number}. Starting a new round...",
+                    fg_color="red"
+                )
+                self.new_round()
+
+        self.entry.delete(0, tk.END)
+
+    def go_back(self):
+        self.frame.destroy()
+        self.app.__init__(self.root)
+
+
 if __name__ == "__main__":
     root = ctk.CTk()
     app = GameApp(root)
     root.mainloop()
-
