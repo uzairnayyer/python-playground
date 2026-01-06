@@ -17,6 +17,7 @@ This project was created as a learning exercise to practice:
 - **Rock, Paper, Scissors**
 - **Typing Speed Game**
 - **Word Scramble**
+- **Number Guessing Game**
 
 Each game is implemented as a separate class and can be accessed from the main menu.
 
