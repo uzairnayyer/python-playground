@@ -7,14 +7,12 @@ import time
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
 
-# Main App Class
 class GameApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Python Playgroundd")
         self.root.geometry("600x400")
         
-        # Create main menu frame
         self.main_menu = ctk.CTkFrame(self.root)
         self.main_menu.pack(pady=20, padx=20, fill="both", expand=True)
         
@@ -24,7 +22,6 @@ class GameApp:
         self.title_label = ctk.CTkLabel(self.main_menu, text="Select a game to play", font=("Arial", 16))
         self.title_label.pack(pady=10)
 
-        # Buttons for games
         self.btn_guess_word = ctk.CTkButton(self.main_menu, text="Guess the Word", command=self.start_guess_the_word)
         self.btn_guess_word.pack(pady=5)
 
@@ -42,6 +39,9 @@ class GameApp:
 
         self.btn_number_guess = ctk.CTkButton(self.main_menu, text="Number Guessing Game", command=self.start_number_guess)
         self.btn_number_guess.pack(pady=5)
+
+        self.btn_tictactoe = ctk.CTkButton(self.main_menu, text="Tic-Tac-Toe", command=self.start_tictactoe)
+        self.btn_tictactoe.pack(pady=5)
 
     def clear_frame(self):
         for widget in self.root.winfo_children():
@@ -71,7 +71,10 @@ class GameApp:
         self.clear_frame()
         NumberGuessingGame(self.root, self)
 
-# Guess the Word Game Class
+    def start_tictactoe(self):
+        self.clear_frame()
+        TicTacToe(self.root, self)
+
 class GuessTheWord:
     def __init__(self, root, app):
         self.root = root
@@ -501,11 +504,133 @@ class NumberGuessingGame:
 
         self.entry.delete(0, tk.END)
 
+
+class TicTacToe:
+    def __init__(self, root, app):
+        self.root = root
+        self.app = app
+
+        self.current_player = "X"  # You are X
+        self.board = [""] * 9
+        self.game_over = False
+
+        self.frame = ctk.CTkFrame(self.root)
+        self.frame.pack(pady=20, padx=20, fill="both", expand=True)
+
+        self.title_label = ctk.CTkLabel(self.frame, text="Tic-Tac-Toe", font=("Arial", 18))
+        self.title_label.pack(pady=10)
+
+        self.info_label = ctk.CTkLabel(
+            self.frame,
+            text="You are X, Computer is O.\nClick a square to play.",
+            font=("Arial", 14)
+        )
+        self.info_label.pack(pady=5)
+
+        self.grid_frame = ctk.CTkFrame(self.frame)
+        self.grid_frame.pack(pady=10)
+
+        self.buttons = []
+        for i in range(9):
+            btn = ctk.CTkButton(
+                self.grid_frame,
+                text="",
+                width=80,
+                height=80,
+                font=("Arial", 24),
+                command=lambda idx=i: self.handle_click(idx)
+            )
+            row, col = divmod(i, 3)
+            btn.grid(row=row, column=col, padx=5, pady=5)
+            self.buttons.append(btn)
+
+        self.status_label = ctk.CTkLabel(self.frame, text="Your turn (X)", font=("Arial", 14))
+        self.status_label.pack(pady=10)
+
+        self.buttons_bottom_frame = ctk.CTkFrame(self.frame)
+        self.buttons_bottom_frame.pack(pady=10)
+
+        self.restart_button = ctk.CTkButton(self.buttons_bottom_frame, text="Restart", command=self.restart_game)
+        self.restart_button.pack(side=tk.LEFT, padx=5)
+
+        self.back_button = ctk.CTkButton(self.buttons_bottom_frame, text="Back to Menu", command=self.go_back)
+        self.back_button.pack(side=tk.LEFT, padx=5)
+
+    def handle_click(self, index):
+        if self.game_over or self.board[index] != "":
+            return
+
+        # Player move
+        self.board[index] = "X"
+        self.buttons[index].configure(text="X")
+        winner = self.check_winner()
+
+        if winner:
+            self.end_game(winner)
+            return
+
+        # Computer move
+        self.status_label.configure(text="Computer's turn (O)")
+        self.root.after(400, self.computer_move)  # small delay for nicer feel
+
+    def computer_move(self):
+        if self.game_over:
+            return
+
+        empty_indices = [i for i, v in enumerate(self.board) if v == ""]
+        if not empty_indices:
+            return
+
+        choice = random.choice(empty_indices)
+        self.board[choice] = "O"
+        self.buttons[choice].configure(text="O")
+
+        winner = self.check_winner()
+        if winner:
+            self.end_game(winner)
+        else:
+            self.status_label.configure(text="Your turn (X)")
+
+    def check_winner(self):
+        winning_combos = [
+            (0, 1, 2), (3, 4, 5), (6, 7, 8), 
+            (0, 3, 6), (1, 4, 7), (2, 5, 8),  
+            (0, 4, 8), (2, 4, 6)            
+        ]
+
+        for a, b, c in winning_combos:
+            if self.board[a] != "" and self.board[a] == self.board[b] == self.board[c]:
+                return self.board[a] 
+        if "" not in self.board:
+            return "Tie"
+
+        return None
+
+    def end_game(self, winner):
+        self.game_over = True
+        if winner == "Tie":
+            self.status_label.configure(text="It's a tie")
+        elif winner == "X":
+            self.status_label.configure(text="You win")
+        else:
+            self.status_label.configure(text="Computer wins")
+
+    def restart_game(self):
+        self.board = [""] * 9
+        self.game_over = False
+        for btn in self.buttons:
+            btn.configure(text="")
+        self.current_player = "X"
+        self.status_label.configure(text="Your turn (X)")
+
     def go_back(self):
         self.frame.destroy()
         self.app.__init__(self.root)
 
-
+    def go_back(self):
+        self.frame.destroy()
+        self.app.__init__(self.root)
+    
 if __name__ == "__main__":
     root = ctk.CTk()
     app = GameApp(root)
