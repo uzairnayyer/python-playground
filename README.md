@@ -18,6 +18,7 @@ This project was created as a learning exercise to practice:
 - **Typing Speed Game**
 - **Word Scramble**
 - **Number Guessing Game**
+- **Tic Tac Toe**
 
 Each game is implemented as a separate class and can be accessed from the main menu.
 
