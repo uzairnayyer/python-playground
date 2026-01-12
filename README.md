@@ -19,6 +19,7 @@ This project was created as a learning exercise to practice:
 - **Word Scramble**
 - **Number Guessing Game**
 - **Tic Tac Toe**
+- **Memory Card Game**
 
 Each game is implemented as a separate class and can be accessed from the main menu.
 
